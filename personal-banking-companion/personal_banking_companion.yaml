@@ -5,7 +5,7 @@ name: personal_banking_companion
 display_name: Personal Banking Companion
 
 description: |
-  A personal banking companion for Prisha Malhotra's that helps surface
+  A personal banking companion that helps surface
   account balances, upcoming subscriptions and recent recurring spending.
 
 llm: groq/openai/gpt-oss-120b
@@ -22,7 +22,7 @@ tools:
 hidden: false
 
 welcome_content:
-  welcome_message: "Hi Prisha, how can I help today?"
+  welcome_message: "Hi there, how can I help today?"
   description: "I can help you understand your account, spending and everyday banking."
 
 starter_prompts:
