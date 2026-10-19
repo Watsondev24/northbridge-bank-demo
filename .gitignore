@@ -5,3 +5,7 @@
 __pycache__/
 *.pyc
 .venv/
+
+controls/*.sqlite3
+*.sqlite3
+__pycache__/

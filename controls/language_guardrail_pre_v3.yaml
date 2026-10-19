@@ -1,0 +1,44 @@
+openapi: 3.0.3
+info:
+  title: Language Guardrail Pre Invoke v3
+  version: 3.0.0
+servers:
+  - url: https://YOUR_GUARDRAIL_HOST.example.com
+paths:
+  /agent_pre_invoke:
+    post:
+      operationId: language_guardrail_pre_v3
+      description: Tracks language violations and blocks repeat or severe abuse.
+      x-ibm-orchestrate-plugin:
+        hook: agent_pre_invoke
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - payload
+              - context
+              properties:
+                payload:
+                  type: object
+                  additionalProperties: true
+                context:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Pre-invoke decision
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - continue_processing
+                properties:
+                  continue_processing:
+                    type: boolean
+                  modified_payload:
+                    type: object
+                    additionalProperties: true
