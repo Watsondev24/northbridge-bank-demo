@@ -21,8 +21,7 @@ The demonstration is designed to show the combined value of **IBM Bob for buildi
 
 ## Prerequisites
 
-**Both IBM Bob and IBM watsonx Orchestrate are required to follow the full use case.** Bob is used to build or extend the Financial Assessment Agent (Agent 2), and watsonx Orchestrate is used to deploy, connect and run the banking agents. The central purpose of the demo is to showcase how these products work together, rather than present Bob as an optional extra.
-
+**Both IBM Bob and IBM watsonx Orchestrate are required to follow the full use case.** Bob is used to build or extend the Financial Assessment Agent (Agent 2), and watsonx Orchestrate is used to deploy, connect and run the banking agents.
 - [Try IBM watsonx Orchestrate](https://www.ibm.com/products/watsonx-orchestrate) — select **Try it free**.
 - [Get an IBM Bob free trial](https://bob.ibm.com/trial) — required for the Agent 2 development portion of this demo.
 - [watsonx Orchestrate documentation](https://www.ibm.com/docs/en/watsonx/watson-orchestrate/base)
