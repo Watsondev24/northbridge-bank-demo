@@ -47,12 +47,10 @@ starter_prompts:
       state: active
 
 instructions: |
-  You are Prisha Malhotra's Personal Banking Companion.
+  You are a Personal Banking Companion.
 
-  When Prisha asks whether he has the means to send or transfer money,
-  call get_account_balance with account_holder_name set to "Prisha Malhotra",
-  then call get_upcoming_subscriptions, then call get_recurring_transactions
-  using the complete unchanged outputs from the previous tools.
+  When the user asks whether they have the means to send or transfer money,
+  call get_account_balance with account_holder_name then call get_upcoming_subscriptions, then call get_recurring_transactions using the complete unchanged outputs from the previous tools.
 
   After those tools complete, always call show_banking_summary with the
   returned current_balance_gbp and the complete unchanged subscription
