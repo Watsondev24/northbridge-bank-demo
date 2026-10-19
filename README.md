@@ -11,7 +11,25 @@ An interactive banking demo showcasing **IBM Bob and IBM watsonx Orchestrate wor
 | **Agent 1** | **Personal Banking Companion** | Retrieves and presents account information, upcoming subscriptions and recurring transactions using the available tools. It does not independently perform affordability or risk assessments. |
 | **Agent 2** | **Financial Assessment Agent** | Adds financial assessment capabilities, using its assessment tools and the banking information available to it. |
 
-The demonstration is designed to show the combined value of **IBM Bob for building the Financial Assessment Agent** and **watsonx Orchestrate for running and orchestrating both agents**. The two-agent design keeps **information retrieval** separate from **financial assessment**. The companion answers straightforward banking questions; the assessment agent is designed to handle requests that require additional calculations or judgement once collaboration is configured. The provided agent definitions are a starting point. **The Personal Banking Companion currently has `collaborators: []`**, so Agent 2 must be registered as a collaborator and its instructions updated to delegate assessment requests before the fully connected flow will work.
+## Overview
+
+Northbridge Bank is an end-to-end agentic AI demonstration showcasing how **IBM watsonx Orchestrate and IBM Bob work together to accelerate the Agent Development Lifecycle**, from identifying gaps in existing AI agents to building, testing, governing and deploying new capabilities.
+
+The demonstration begins with a **Personal Banking Companion** built on watsonx Orchestrate. While the agent can retrieve account balances, upcoming subscriptions and recurring transactions, it cannot assess whether a customer can comfortably afford a proposed money transfer. This limitation creates a frustrating customer experience and leads to negative feedback.
+
+Using the **watsonx Orchestrate Control Plane**, the team gains visibility into agent performance, analyses customer conversations and sentiment, and identifies the capability gap. Rather than manually developing a solution, the team turns to **IBM Bob** to build a specialist **Financial Assessment Agent**, complete with a calculation tool, which can be deployed into watsonx Orchestrate and connected to the existing banking agent as a collaborator.
+
+But building an agent is only part of the challenge. Before deployment, the new agent undergoes **red-teaming simulations** to identify vulnerabilities and test its resilience against adversarial attacks. The team then uses **watsonx Orchestrate Controls and custom guardrail plugins** to introduce appropriate safeguards, test policy adherence and strengthen the agent's security.
+
+Finally, the enhanced banking experience is tested and deployed, allowing the Personal Banking Companion to collaborate with the new Financial Assessment Agent and provide customers with more informed responses.
+
+**The result is a complete Agent Development Lifecycle:**
+
+**Identify → Build → Test → Govern → Deploy → Monitor**
+
+Together, IBM Bob and watsonx Orchestrate demonstrate how organisations can accelerate agent development while maintaining the visibility, security and governance required to operationalise AI agents responsibly.
+
+*Implementation note: The supplied agent YAMLs are starting configurations. The Financial Assessment Agent still needs to be registered as a collaborator in the Personal Banking Companion to enable the complete experience. The red-teaming simulations and controls are demonstrated separately and are not automatically configured by these files.*
 
 ## Repository contents
 
