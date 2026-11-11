@@ -1,0 +1,49 @@
+/* Northbridge site on the left, the voice assistant on the right. */
+:root {
+  color-scheme: light;
+  --accent: #0066CC;
+  --ink: #1C1C1E;
+  --ink-2: #424245;
+  --muted: #6E6E73;
+  --hairline: rgba(60,60,67,0.2);
+  --panel: #FBFBFD;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+}
+html, body { height: 100%; }
+body { margin: 0; background: #FFFFFF; font-family: var(--font); color: var(--ink); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #004C99; text-decoration: underline; }
+button { font: inherit; cursor: pointer; }
+
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 40%); height: 100vh; height: 100dvh; }
+.site { overflow-y: auto; container-type: inline-size; overscroll-behavior: contain; }
+
+.assistant { display: flex; flex-direction: column; min-height: 0; background: var(--panel); border-left: 0.5px solid var(--hairline); }
+.assistant-head { min-height: 52px; padding: 0 22px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid var(--hairline); }
+.assistant-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 500; letter-spacing: -0.2px; }
+.assistant-title .mark { width: 22px; height: 22px; border-radius: 6px; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+.badge { font-size: 12px; color: var(--muted); }
+
+.stage { position: relative; flex: 1; min-height: 280px; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage:focus-visible { box-shadow: inset 0 0 0 3px rgba(0,102,204,0.35); }
+
+.assistant-foot { padding: 0 28px 36px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.caption { margin: 0; }
+.toggle { border: 0; border-radius: 980px; padding: 12px 24px; font-size: 17px; color: #FFFFFF; background: var(--accent); }
+.toggle:hover { background: #0077ED; }
+.toggle[aria-pressed="true"] { background: #E8E8ED; color: var(--ink); }
+.toggle[aria-pressed="true"]:hover { background: #DCDCE1; }
+.toggle:focus-visible { outline: 3px solid rgba(0,102,204,0.4); outline-offset: 2px; }
+
+@media (max-width: 860px) {
+  .split { display: block; height: auto; }
+  .site { overflow: visible; }
+  .assistant { border-left: 0; border-top: 0.5px solid var(--hairline); min-height: 100vh; min-height: 100svh; }
+  .assistant-head { padding: 0 16px; }
+  .assistant-foot { padding: 0 16px 32px; }
+}
+
+/* Only used for problems: microphone blocked, service unavailable. */
+.caption { color: #C4362B; font-size: 16px; font-weight: 400; }
+.caption:empty { display: none; }
