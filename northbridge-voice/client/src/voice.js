@@ -49,8 +49,7 @@ export class VoiceSession {
     this.eventsLive = false;
     this.phase = '';           // '' | 'filler' | 'ask' | 'music' | 'hold' | 'answer', for the current turn
     this.music = new HoldMusic('/hold-music.mp3');
-    this.specialist = false;   // this turn has gone to the mortgage specialist
-    this.handoffHeard = false; // the specialist heads-up has started playing
+    this.handoffHeard = false; // "...is that okay?" has started playing
     this.handoffDone = false;  // ...and has finished
   }
 
@@ -99,7 +98,6 @@ export class VoiceSession {
             this.ackHeard = false;
             this.ackDone = false;
             this.phase = '';
-            this.specialist = false;
             this.handoffHeard = false;
             this.handoffDone = false;
           }
@@ -142,7 +140,7 @@ export class VoiceSession {
     if (!conversationId || typeof EventSource === 'undefined') return;
     const events = new EventSource(`/api/turn-events/${encodeURIComponent(conversationId)}`);
     events.onmessage = (e) => {
-      if (['filler', 'ask', 'specialist', 'music', 'hold', 'answer'].includes(e.data)) this.phase = e.data;
+      if (['filler', 'ask', 'music', 'hold', 'answer'].includes(e.data)) this.phase = e.data;
       if (e.data === 'music') this.startMusic();
       else if (e.data === 'answer') this.stopMusic();
     };
@@ -264,15 +262,6 @@ export class VoiceSession {
             this.owedSince = 0;
             return { state: 'listening', user: level(inp), agent: 0 };
           }
-          return { state: 'thinking', user: 0, agent: 0 };
-        case 'specialist':
-          // "That's one for our mortgage specialist...": a full sentence, so
-          // it shows as speaking; then thinking until the answer arrives.
-          if (agentAudible && !this.handoffDone) {
-            this.handoffHeard = true;
-            return { state: 'handoff', user: 0, agent: level(out) };
-          }
-          if (this.handoffHeard) this.handoffDone = true;
           return { state: 'thinking', user: 0, agent: 0 };
         case 'hold':
           return { state: 'thinking', user: 0, agent: 0 };

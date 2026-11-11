@@ -39,8 +39,8 @@ class WxoClient:
             http2=False,
         )
 
-    def completions_url(self, agent_id: Optional[str] = None) -> str:
-        return f"{self.instance_url}/v2/orchestrate/{agent_id or self.agent_id}/chat/completions"
+    def completions_url(self) -> str:
+        return f"{self.instance_url}/v2/orchestrate/{self.agent_id}/chat/completions"
 
     async def aclose(self) -> None:
         await self._http.aclose()
@@ -65,12 +65,9 @@ class WxoClient:
             log.info("IAM token refreshed, valid for %ds", int(self._token_expires - time.time()))
             return self._token
 
-    async def stream(
-        self, text: str, thread_id: Optional[str], agent_id: Optional[str] = None
-    ) -> AsyncIterator[WxoEvent]:
+    async def stream(self, text: str, thread_id: Optional[str]) -> AsyncIterator[WxoEvent]:
         """Send one user message and yield events as the agent replies.
 
-        `agent_id` defaults to the main agent; the filler agent passes its own.
         Cancelling the consumer closes the HTTP stream, which stops the run
         on the wxO side as far as the client is concerned.
         """
@@ -83,7 +80,7 @@ class WxoClient:
         }
         body = {"messages": [{"role": "user", "content": text}], "stream": True}
 
-        url = self.completions_url(agent_id)
+        url = self.completions_url()
         async with self._http.stream("POST", url, headers=headers, json=body) as resp:
             if resp.status_code != 200:
                 detail = (await resp.aread())[:300].decode("utf-8", "replace")

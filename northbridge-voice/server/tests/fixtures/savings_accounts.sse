@@ -1,0 +1,210 @@
+data: {"id": "1792600000000-0", "object": "thread.run.step.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "step_details": {"type": "tool_calls", "tool_calls": [{"name": "northbridge_bank_products_and_services", "args": {"query": "Northbridge savings accounts"}, "id": "fc_00000000-0000-4000-8000-000000000003"}], "content": "", "agent_display_name": "Northbridge_Bank_Agent"}}}]}
+
+data: {"id": "1792600000000-1", "object": "thread.run.step.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "step_details": {"type": "tool_response", "content": "{\"answer\":\"(knowledge base passages trimmed for the fixture)\"}", "name": "northbridge_bank_products_and_services", "tool_call_id": "fc_00000000-0000-4000-8000-000000000003", "agent_display_name": "Northbridge_Bank_Agent"}}}]}
+
+data: {"id": "1792600000000-2", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "Sure"}}]}
+
+data: {"id": "1792600000000-3", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " thing"}}]}
+
+data: {"id": "1792600000000-4", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "!"}}]}
+
+data: {"id": "1792600000000-5", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " Here’s"}}]}
+
+data: {"id": "1792600000000-6", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " a"}}]}
+
+data: {"id": "1792600000000-7", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " quick"}}]}
+
+data: {"id": "1792600000000-8", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " rundown"}}]}
+
+data: {"id": "1792600000000-9", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " of"}}]}
+
+data: {"id": "1792600000000-10", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " Northbridge’s"}}]}
+
+data: {"id": "1792600000000-11", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " savings"}}]}
+
+data: {"id": "1792600000000-12", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " accounts"}}]}
+
+data: {"id": "1792600000000-13", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": ":"}}]}
+
+data: {"id": "1792600000000-14", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "\n\n-"}}]}
+
+data: {"id": "1792600000000-15", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " *"}}]}
+
+data: {"id": "1792600000000-16", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "*"}}]}
+
+data: {"id": "1792600000000-17", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "Easy"}}]}
+
+data: {"id": "1792600000000-18", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " Access"}}]}
+
+data: {"id": "1792600000000-19", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " Saver"}}]}
+
+data: {"id": "1792600000000-20", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "**"}}]}
+
+data: {"id": "1792600000000-21", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " –"}}]}
+
+data: {"id": "1792600000000-22", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " a"}}]}
+
+data: {"id": "1792600000000-23", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " variable"}}]}
+
+data: {"id": "1792600000000-24", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " rate"}}]}
+
+data: {"id": "1792600000000-25", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": ","}}]}
+
+data: {"id": "1792600000000-26", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " and"}}]}
+
+data: {"id": "1792600000000-27", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " you"}}]}
+
+data: {"id": "1792600000000-28", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " can"}}]}
+
+data: {"id": "1792600000000-29", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " take"}}]}
+
+data: {"id": "1792600000000-30", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " money"}}]}
+
+data: {"id": "1792600000000-31", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " out"}}]}
+
+data: {"id": "1792600000000-32", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " whenever"}}]}
+
+data: {"id": "1792600000000-33", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " you"}}]}
+
+data: {"id": "1792600000000-34", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " like"}}]}
+
+data: {"id": "1792600000000-35", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "."}}]}
+
+data: {"id": "1792600000000-36", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "  \n-"}}]}
+
+data: {"id": "1792600000000-37", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " *"}}]}
+
+data: {"id": "1792600000000-38", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "*"}}]}
+
+data: {"id": "1792600000000-39", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "Fixed"}}]}
+
+data: {"id": "1792600000000-40", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " Rate"}}]}
+
+data: {"id": "1792600000000-41", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " Saver"}}]}
+
+data: {"id": "1792600000000-42", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "**"}}]}
+
+data: {"id": "1792600000000-43", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " –"}}]}
+
+data: {"id": "1792600000000-44", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " a"}}]}
+
+data: {"id": "1792600000000-45", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " fixed"}}]}
+
+data: {"id": "1792600000000-46", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " rate"}}]}
+
+data: {"id": "1792600000000-47", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " for"}}]}
+
+data: {"id": "1792600000000-48", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " one"}}]}
+
+data: {"id": "1792600000000-49", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " or"}}]}
+
+data: {"id": "1792600000000-50", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " two"}}]}
+
+data: {"id": "1792600000000-51", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " years"}}]}
+
+data: {"id": "1792600000000-52", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": ","}}]}
+
+data: {"id": "1792600000000-53", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " in"}}]}
+
+data: {"id": "1792600000000-54", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " return"}}]}
+
+data: {"id": "1792600000000-55", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " for"}}]}
+
+data: {"id": "1792600000000-56", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " leaving"}}]}
+
+data: {"id": "1792600000000-57", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " the"}}]}
+
+data: {"id": "1792600000000-58", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " money"}}]}
+
+data: {"id": "1792600000000-59", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " untouched"}}]}
+
+data: {"id": "1792600000000-60", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "."}}]}
+
+data: {"id": "1792600000000-61", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "  \n-"}}]}
+
+data: {"id": "1792600000000-62", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " *"}}]}
+
+data: {"id": "1792600000000-63", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "*"}}]}
+
+data: {"id": "1792600000000-64", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "Cash"}}]}
+
+data: {"id": "1792600000000-65", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " ISA"}}]}
+
+data: {"id": "1792600000000-66", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "**"}}]}
+
+data: {"id": "1792600000000-67", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " –"}}]}
+
+data: {"id": "1792600000000-68", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " interest"}}]}
+
+data: {"id": "1792600000000-69", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " paid"}}]}
+
+data: {"id": "1792600000000-70", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " tax-free"}}]}
+
+data: {"id": "1792600000000-71", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": ","}}]}
+
+data: {"id": "1792600000000-72", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " up"}}]}
+
+data: {"id": "1792600000000-73", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " to"}}]}
+
+data: {"id": "1792600000000-74", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " your"}}]}
+
+data: {"id": "1792600000000-75", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " yearly"}}]}
+
+data: {"id": "1792600000000-76", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " ISA"}}]}
+
+data: {"id": "1792600000000-77", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " allowance"}}]}
+
+data: {"id": "1792600000000-78", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "."}}]}
+
+data: {"id": "1792600000000-79", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "  \n\nYou"}}]}
+
+data: {"id": "1792600000000-80", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " can"}}]}
+
+data: {"id": "1792600000000-81", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " open"}}]}
+
+data: {"id": "1792600000000-82", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " any"}}]}
+
+data: {"id": "1792600000000-83", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " of"}}]}
+
+data: {"id": "1792600000000-84", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " them"}}]}
+
+data: {"id": "1792600000000-85", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " in"}}]}
+
+data: {"id": "1792600000000-86", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " the"}}]}
+
+data: {"id": "1792600000000-87", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " Northbridge"}}]}
+
+data: {"id": "1792600000000-88", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " app"}}]}
+
+data: {"id": "1792600000000-89", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " in"}}]}
+
+data: {"id": "1792600000000-90", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " a"}}]}
+
+data: {"id": "1792600000000-91", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " few"}}]}
+
+data: {"id": "1792600000000-92", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " minutes"}}]}
+
+data: {"id": "1792600000000-93", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "."}}]}
+
+data: {"id": "1792600000000-94", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " Is"}}]}
+
+data: {"id": "1792600000000-95", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " there"}}]}
+
+data: {"id": "1792600000000-96", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " a"}}]}
+
+data: {"id": "1792600000000-97", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " particular"}}]}
+
+data: {"id": "1792600000000-98", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " account"}}]}
+
+data: {"id": "1792600000000-99", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " you’d"}}]}
+
+data: {"id": "1792600000000-100", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " like"}}]}
+
+data: {"id": "1792600000000-101", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " details"}}]}
+
+data: {"id": "1792600000000-102", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": " on"}}]}
+
+data: {"id": "1792600000000-103", "object": "thread.message.delta", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "choices": [{"delta": {"role": "assistant", "content": "?"}}]}
+
+data: {"id": "1792600000000-104", "object": "thread.message.completed", "thread_id": "00000000-0000-4000-8000-000000000001", "run_id": "00000000-0000-4000-8000-000000000002", "model": "groq/openai/gpt-oss-120b", "created": 1792600000, "trace_id": "00000000000000000000000000000000", "data": {"message": {"role": "assistant", "content": [{"response_type": "text", "id": "00000000-0000-4000-8000-000000000004", "text": "Sure thing! Here’s a quick rundown of Northbridge’s savings accounts:\n\n- **Easy Access Saver** – a variable rate, and you can take money out whenever you like.  \n- **Fixed Rate Saver** – a fixed rate for one or two years, in return for leaving the money untouched.  \n- **Cash ISA** – interest paid tax-free, up to your yearly ISA allowance.  \n\nYou can open any of them in the Northbridge app in a few minutes. Is there a particular account you’d like details on?"}]}}, "choices": [{"message": {"role": "assistant", "content": "Sure thing! Here’s a quick rundown of Northbridge’s savings accounts:\n\n- **Easy Access Saver** – a variable rate, and you can take money out whenever you like.  \n- **Fixed Rate Saver** – a fixed rate for one or two years, in return for leaving the money untouched.  \n- **Cash ISA** – interest paid tax-free, up to your yearly ISA allowance.  \n\nYou can open any of them in the Northbridge app in a few minutes. Is there a particular account you’d like details on?"}}]}
+

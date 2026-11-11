@@ -6,7 +6,8 @@
                     finished user turn; replies stream back from wxO
   GET  /            the built browser client (client/dist)
 
-Run locally:  uvicorn app:app --port 8080   (from this folder)
+Run from the project folder:
+  python -m uvicorn app:app --app-dir server --port 8080
 """
 
 from __future__ import annotations
@@ -47,29 +48,22 @@ SPEECH_ENGINE_ID = env("ELEVENLABS_SPEECH_ENGINE_ID")
 WXO_INSTANCE_URL = env("WXO_INSTANCE_URL")
 WXO_AGENT_ID = env("WXO_AGENT_ID")
 WXO_API_KEY = env("WXO_API_KEY")
-# Second, tool-free agent that writes the lines spoken while the main agent
-# works. Same instance and API key. Leave empty to use a plain "Mm-hmm." instead.
-WXO_FILLER_AGENT_ID = env("WXO_FILLER_AGENT_ID")
 DEBUG = env_bool("DEBUG")
-DISABLE_AUTH = env_bool("DISABLE_AUTH")
 # Pause after one filler line finishes before the next "still on it" line.
 LINE_GAP_SECONDS = float(env("LINE_GAP_SECONDS", "0.6"))
 QUICK_FILLER = env_bool("QUICK_FILLER", True)
-# Without a filler agent, two tiers of hard-coded lines, each used in order and
-# starting again from the first. Separate them with |. Cues in [brackets] are
-# acted out by v3/v4 voices and removed for other models.
+# Two tiers of filler lines, each used in order and starting again from the
+# first. Separate them with |. Cues in [brackets] are acted out by v3/v4
+# voices and removed for other models.
 #
 # FILLERS: when wxO starts searching (or, as a backstop, if nothing has come
 # back ACKNOWLEDGE_AFTER seconds after the caller finishes). Answers that
 # need no search get nothing.
 ACKNOWLEDGEMENTS = [a.strip() for a in env(
     "FILLERS",
-    env(
-        "ACKNOWLEDGEMENTS",
-        "[thoughtfully] Hm...|[softly] Uh, let's see...|[quietly] Mm...|"
-        "[thoughtfully] Right, um... one moment...|[softly] Mhm...|"
-        "[thoughtfully] Ahh... let me have a look...|[quietly] Okay, so...|[softly] Mm, let me see...",
-    ),
+    "[thoughtfully] Hm...|[softly] Uh, let's see...|[quietly] Mm...|"
+    "[thoughtfully] Right, um... one moment...|[softly] Mhm...|"
+    "[thoughtfully] Ahh... let me have a look...|[quietly] Okay, so...|[softly] Mm, let me see...",
 ).split("|") if a.strip()]
 ACKNOWLEDGE_AFTER = float(env("ACKNOWLEDGE_AFTER", "1.5"))
 # ...but sooner for questions that look like they'll need a search, without
@@ -103,8 +97,10 @@ if "v3" not in TTS_MODEL and "v4" not in TTS_MODEL:
         return [t for t in (" ".join(re.sub(r"\[[^\]]*\]", "", a).split()) for a in lines) if t]
     STILL_THINKING = _untagged(STILL_THINKING)
     ACKNOWLEDGEMENTS = _untagged(ACKNOWLEDGEMENTS)
+# ngrok makes the page public, so each address may only start this many
+# conversations a minute (each one uses ElevenLabs credit).
 TOKENS_PER_MINUTE = int(env("TOKENS_PER_MINUTE", "12"))
-CLIENT_DIST = Path(env("CLIENT_DIST", str(ROOT.parent / "client" / "dist")))
+CLIENT_DIST = ROOT.parent / "client" / "dist"
 
 logging.basicConfig(
     level=logging.DEBUG if DEBUG else logging.INFO,
@@ -141,13 +137,9 @@ async def lifespan(app: FastAPI):
         # The server must be reachable before the engine can be registered,
         # so it starts without one. /api/token answers 503 until it's set.
         log.warning("ELEVENLABS_SPEECH_ENGINE_ID not set: run create_engine.py, then restart")
-    if DISABLE_AUTH:
-        log.warning("DISABLE_AUTH is on: /ws accepts unauthenticated connections")
     log.info("wxO agent %s at %s", WXO_AGENT_ID, WXO_INSTANCE_URL)
-    if WXO_FILLER_AGENT_ID and QUICK_FILLER:
-        log.info("filler agent %s", WXO_FILLER_AGENT_ID)
-    else:
-        log.info("no filler agent: hard-coded fillers when wxO searches (%d lines)", len(ACKNOWLEDGEMENTS))
+    if QUICK_FILLER:
+        log.info("fillers while wxO searches: %d lines", len(ACKNOWLEDGEMENTS))
         if STILL_THINKING and STILL_THINKING_AFTER > 0:
             log.info("  then, if still thinking after %.1f s: %d quieter lines", STILL_THINKING_AFTER, len(STILL_THINKING))
     if SPECIALIST_ASK:
@@ -211,20 +203,11 @@ async def conversation_token(request: Request):
     return JSONResponse({"token": res.token}, headers={"Cache-Control": "no-store"})
 
 
-@app.get("/healthz")
-async def healthz():
-    return {"ok": True, "speech_engine": bool(SPEECH_ENGINE_ID)}
-
-
-# ── ElevenLabs: Speech Engine upstream ───────────────────────────────────
-
-
 # ── browser: what's playing right now ────────────────────────────────────
-# The page shows Listening / Thinking / Speaking. It can hear sound levels but
-# not whether a sound is a filler or the answer, so the server tells it, per
-# conversation: "filler", "ask" (asking whether the caller minds waiting for the
-# mortgage specialist), "music" (they said yes: play hold music), "hold" (a
-# still-thinking line), "answer".
+# The page can hear sound levels but not whether a sound is a filler or the
+# answer, so the server tells it, per conversation: "filler", "ask" (asking
+# whether the caller minds waiting for the mortgage specialist), "music"
+# (they said yes: play hold music), "hold" (a still-thinking line), "answer".
 
 _phase_listeners: dict[str, set] = defaultdict(set)
 _last_phase: dict[str, str] = {}
@@ -282,7 +265,7 @@ async def speech_engine(ws: WebSocket):
         return
     # Only ElevenLabs may open this socket: it signs each connection with a
     # JWT derived from our API key. Reject before accepting the upgrade.
-    if not DISABLE_AUTH and not engine.verify_request(ws.headers):
+    if not engine.verify_request(ws.headers):
         log.warning("rejected /ws connection without a valid ElevenLabs signature")
         await ws.close(code=1008)
         return
@@ -292,7 +275,6 @@ async def speech_engine(ws: WebSocket):
         app.state.wxo,
         hold_after=LINE_GAP_SECONDS,
         quick_filler=QUICK_FILLER,
-        filler_agent_id=WXO_FILLER_AGENT_ID,
         acknowledgements=ACKNOWLEDGEMENTS,
         still_thinking=STILL_THINKING,
         still_thinking_after=STILL_THINKING_AFTER,
@@ -335,9 +317,6 @@ async def speech_engine(ws: WebSocket):
         log.info("[%s] conversation ended", convo.cid)
 
 
-# ── wxO controls ─────────────────────────────────────────────────────────
-# Pre-invoke plugin wxO calls before the Northbridge agent runs (Controls →
-# Use existing OpenAPI tool, with mortgage_risk_warning_openapi.yaml).
 # ── static client ────────────────────────────────────────────────────────
 
 if CLIENT_DIST.is_dir():

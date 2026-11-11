@@ -1,267 +1,213 @@
 # Northbridge Bank voice assistant
 
-The Northbridge site on the left, the voice assistant on the right. Tap the
-orb, talk to the Northbridge Banking Assistant in watsonx Orchestrate, hear it
-answer. ElevenLabs Speech Engine handles the microphone, speech-to-text,
-turn-taking and the voice. This project connects it to wxO and draws the orb.
+A voice front end for the Northbridge Bank Agent in watsonx Orchestrate (wxO).
+The Northbridge site is on the left and a voice orb on the right: click
+**Start conversation** and talk to the agent.
+
+ElevenLabs Speech Engine handles the microphone, speech-to-text, turn-taking
+and the voice. This project connects it to wxO, keeps the conversation
+natural while the agents work, and draws the orb.
 
 ```
 Browser ──── GET /api/token ─────────────► this server ── WebRTC token ─► ElevenLabs
-   │                                                                     
-   └── WebRTC audio ──► ElevenLabs (STT, turns, TTS)                   
-                            │  each finished user turn                 
-                            ▼                                          
-                        wss://<this server>/ws                         
-                            │  latest user message + thread id         
-                            ▼                                          
+   │
+   └── WebRTC audio ──► ElevenLabs (STT, turns, TTS)
+                            │  each finished user turn
+                            ▼
+                        wss://<your ngrok address>/ws  ──►  this server
+                            │  latest user message + thread id
+                            ▼
                         watsonx Orchestrate  /v2/orchestrate/{agent}/chat/completions
-                            │  streamed reply                          
-                            ▼                                          
+                            │  streamed reply
+                            ▼
                         cleaned for speech ──► ElevenLabs TTS ──► Browser
 ```
 
-One process does everything: serves the page, issues tokens, and hosts the
-Speech Engine socket. Deploy it as one Code Engine app.
+One process serves the page, issues conversation tokens and hosts the Speech
+Engine socket. It runs on your laptop; ngrok gives ElevenLabs a public address
+to reach it.
 
 ## What happens in a conversation
 
-1. **Tap the orb.** The browser asks for the microphone, gets a token from
-   `/api/token`, and joins the conversation. The orb turns slowly: *Connecting*.
-2. **The agent greets you.** The browser sends `ORB_CLICKED` as the first
-   turn, which the agent's prompt treats as its cue to say hello. The orb spins
-   faster while it thinks, then moves with its voice.
-3. **You ask something.** The orb ripples with your voice. When you stop,
-   it spins: *Thinking*. While the main agent works, a second, tool-free wxO
-   agent (the *filler agent*, `WXO_FILLER_AGENT_ID`) keeps the conversation
-   going in its own words. Nothing is hard-coded. For each question it's sent
-   what the assistant last said, your words, the lines it has already used,
-   and an opening word to start with so it doesn't settle into a favourite.
-   You hear, in order:
-   - **instantly**, a short reaction ("Sure.", "Okay, right.") that the
-     filler agent wrote *ahead*, when the previous answer finished. It fits
-     any question because it promises nothing. Interruptions skip it.
-   - **about a second later**, the filler agent's line for *this* question
-     ("Ah, parking, let me have a look."), unless the answer got there first
-   - then up to two "still on it" lines, each following the previous line
-     after a short pause (`LINE_GAP_SECONDS`), only while the answer hasn't
-     started
+1. **Start conversation.** The browser asks for the microphone, gets a token
+   from the server and joins the call. It sends `ORB_CLICKED` as the first
+   message, which the agent's instructions turn into a greeting.
+2. **You ask something.** While wxO works, a short filler line plays
+   ("Hm...", "Let me have a look...") as soon as it starts searching, and a
+   quieter one if the answer is slow. Thanks and goodbyes get no filler.
+3. **The answer streams back.** Bold, lists and links are cleaned out as it
+   arrives, so nothing like "asterisk" or a URL is read aloud.
+4. **Borrowing estimates take longer.** They go to the Mortgage Agent, which
+   runs outside wxO on Amazon Bedrock AgentCore. The assistant asks "That one
+   might take a little longer to check, is that okay?". If the caller says
+   yes, hold music plays (with the microphone muted) until the answer starts.
+5. **Talk over it any time.** The agent stops and the wxO request is
+   cancelled. If ElevenLabs sends the same question twice, which happens after
+   a pause mid-sentence, the search already running carries on.
 
-   Both are checked before they're spoken (no digits, no questions, nothing
-   long). Thanks and goodbyes don't ask the filler agent at all, and if the
-   main agent answers first, the filler is dropped. `server/filler_agent.py`
-   has the rules for when it's asked, what it's sent and what's spoken.
+The wxO thread lives with the call, so the agent remembers what was said, and
+nothing is kept on the server afterwards.
 
-   **Interruptions and re-sends.** ElevenLabs sometimes sends the same
-   question again, after a pause mid-sentence or when the agent's own voice
-   reaches the microphone. A question that matches the one being answered
-   (allowing for small transcription differences) carries on with the search
-   already running instead of starting over, and isn't acknowledged twice.
-   Only a different question arriving mid-answer counts as an interruption;
-   the filler agent is then told so it can open with a brief apology.
-   **Questions for the mortgage specialist.** Personal borrowing estimates go
-   to the Mortgage Affordability Agent, which runs outside wxO and takes
-   around ten seconds. The assistant asks "That one might take a little longer
-   to check, is that okay?" (`SPECIALIST_ASK`) and ends its turn, while wxO
-   keeps working. When the caller says "sure", hold music
-   (`client/public/hold-music.mp3`) fades in on the page, with the microphone
-   muted so the music isn't heard as speech, and fades out as the answer
-   starts. If they'd rather not wait, it says `SPECIALIST_DECLINED`; anything
-   else is treated as a new question. It's asked straight away when the
-   question is clearly a borrowing estimate with figures ("I earn £70k with
-   £40k saved, how much could I borrow?"), or the moment wxO routes to a tool
-   or agent whose name matches `SPECIALIST_TOOLS`. Product questions
-   ("first-time buyer mortgages") are answered from the knowledge base and
-   get the usual filler.
-4. **The answer streams back.**
-   Bold, bullet points and links are cleaned out
-   as the text streams, so nothing like "asterisk" or a URL gets read aloud.
-5. **Talk over it any time.** The agent stops and the wxO request is cancelled.
+## What you need
 
-The wxO thread id lives with the socket for that conversation, so the agent
-remembers context across turns, and nothing is left on the server afterwards.
+- **watsonx Orchestrate** with the Northbridge Bank Agent, its knowledge base
+  and its two collaborators (the Fraud & Scam Awareness Agent and the Mortgage
+  Agent). You'll need the instance URL, the agent's ID and an API key, all
+  under Settings → API details.
+- **An ElevenLabs** account and API key.
+- **Python 3.10+, Node.js 20.19+ and [ngrok](https://ngrok.com)** (a free
+  account is fine).
 
-## Repository
+## Set up (once)
 
-```
-├── client/                 Vite, no framework
-│   ├── index.html
-│   └── src/
-│       ├── orb.js          the dot-cloud orb and its five states
-│       ├── voice.js        ElevenLabs session + working out the orb's state
-│       ├── main.js         wires the two together, caption
-│       └── styles.css
-├── server/
-│   ├── app.py              FastAPI: /api/token, /ws, static client
-│   ├── turns.py            one conversation: thread, re-sends, timing of filler lines
-│   ├── filler_agent.py     when to ask the filler agent, what it's sent, what's spoken
-│   ├── wxo.py              IAM token + streaming chat/completions
-│   ├── sse.py              parses wxO's stream (text, tool calls, thread id)
-│   ├── speech.py           strips markdown and URLs from streamed text
-│   ├── create_engine.py    registers the Speech Engine with ElevenLabs
-│   └── tests/              run against a real captured wxO stream
-├── Dockerfile
-└── .env.example
-```
+**1. Give the agent its voice instructions.** Paste the block in
+[`wxo-agent-instructions.md`](wxo-agent-instructions.md) into the Northbridge
+Bank Agent's Behavior / Instructions, save, and **deploy**. The app always
+talks to the deployed version, not the draft.
 
-## The wxO agent's instructions
-
-The Northbridge Bank Agent needs voice instructions, including the cue that
-turns `ORB_CLICKED` into a greeting. They're in
-[`wxo-agent-instructions.md`](wxo-agent-instructions.md): paste them into the
-agent's Behavior / Instructions in wxO, save and deploy.
-
-## Deploy to IBM Cloud Code Engine
-
-You need the [IBM Cloud CLI](https://cloud.ibm.com/docs/cli) with the Code
-Engine plugin, and Python 3.10+ on your laptop (for one script).
-
-### 1. Fill in `.env`
+**2. Fill in your settings.**
 
 ```bash
 cp .env.example .env
 ```
 
-Fill in `WXO_INSTANCE_URL`, `WXO_AGENT_ID` and `WXO_API_KEY` (Settings → API details
-in wxO), `ELEVENLABS_API_KEY`, and optionally `ELEVENLABS_VOICE_ID`. Leave `ELEVENLABS_SPEECH_ENGINE_ID` empty for now.
+Fill in `WXO_INSTANCE_URL`, `WXO_AGENT_ID`, `WXO_API_KEY` and
+`ELEVENLABS_API_KEY`, and optionally `ELEVENLABS_VOICE_ID`. Leave
+`ELEVENLABS_SPEECH_ENGINE_ID` empty for now. Never commit `.env`.
 
-### 2. Create the app
-
-```bash
-ibmcloud login --sso
-ibmcloud target -r eu-gb
-ibmcloud plugin install code-engine        # first time only
-
-ibmcloud ce project create --name northbridge-voice     # or: ibmcloud ce project select --name <existing>
-
-ibmcloud ce secret create --name northbridge-voice-env --from-env-file .env
-
-ibmcloud ce application create --name northbridge-voice \
-  --build-source . --strategy dockerfile \
-  --port 8080 \
-  --env-from-secret northbridge-voice-env \
-  --request-timeout 600 \
-  --min-scale 1 --max-scale 3 \
-  --cpu 1 --memory 2G
-```
-
-Code Engine builds the image from this folder and deploys it. The first build
-takes a few minutes.
-
-- `--request-timeout 600` matters. Each conversation is one long-lived
-  WebSocket, and Code Engine cuts requests off at this limit. 600 seconds is
-  its maximum, so conversations are capped at 10 minutes. `create_engine.py`
-  sets the same limit on the ElevenLabs side.
-- `--min-scale 1` keeps one instance warm, so the first tap of the day doesn't
-  wait for a cold start. It costs a little to leave running; set it to `0`
-  when you're not demoing.
-
-Get the app's URL:
+**3. Install and build.**
 
 ```bash
-ibmcloud ce application get --name northbridge-voice --output url
-```
-
-### 3. Register the Speech Engine
-
-On your laptop:
-
-```bash
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r server/requirements.txt
-python server/create_engine.py https://northbridge-voice.xxxxxxxx.eu-gb.codeengine.appdomain.cloud
-```
-
-It prints a line like `ELEVENLABS_SPEECH_ENGINE_ID=seng_…`. Add it to `.env`,
-then give it to the app:
-
-```bash
-ibmcloud ce application update --name northbridge-voice --env ELEVENLABS_SPEECH_ENGINE_ID=seng_...
-```
-
-Open the app URL, tap the orb, and allow the microphone.
-
-To choose the voice, set `ELEVENLABS_VOICE_ID` in `.env` and run
-`create_engine.py` again with the same URL. With the engine ID already in
-`.env`, it updates the existing engine rather than making a new one.
-
-### Updating after a code change
-
-```bash
-ibmcloud ce application update --name northbridge-voice --build-source . --strategy dockerfile
-```
-
-### Logs
-
-```bash
-ibmcloud ce application logs --name northbridge-voice --follow
-```
-
-Each turn logs the user's words, when the tool was called and returned, how
-long until the first reply text, and when the turn finished.
-
-## Run locally
-
-ElevenLabs has to reach your server from the internet, so local runs need a
-tunnel such as ngrok.
-
-```bash
 cd client && npm install && npm run build && cd ..
-pip install -r server/requirements.txt
-uvicorn app:app --app-dir server --port 8080
-ngrok http 8080                                     # in another terminal
-python server/create_engine.py https://<id>.ngrok.app
 ```
 
-Open http://localhost:8080. For front-end work, `npm run dev` in `client/`
-serves on :5173 and proxies `/api` to :8080. In dev, `__orbManual('thinking')`
-in the browser console drives the orb without a session;
-`__orbManual(false)` hands control back.
+## Run it
 
-Tests (no network, no keys needed):
+Use three Terminal tabs, all in this folder.
+
+**Tab 1: the server**
 
 ```bash
-cd server && python -m unittest discover tests
+source .venv/bin/activate
+python -m uvicorn app:app --app-dir server --port 8080
 ```
+
+**Tab 2: ngrok**
+
+```bash
+ngrok http 8080
+```
+
+Copy the `https://….ngrok-free.app` address next to Forwarding.
+
+**Tab 3: point ElevenLabs at it**
+
+```bash
+source .venv/bin/activate
+python server/create_engine.py https://YOUR-ADDRESS.ngrok-free.app
+```
+
+- **The first time**, it creates the Speech Engine and prints
+  `ELEVENLABS_SPEECH_ENGINE_ID=seng_…`. Add that line to `.env` and restart
+  the server in tab 1.
+- **After that**, run it again whenever the ngrok address changes (each time
+  ngrok restarts). It updates the same engine, so the ID never changes.
+
+Open <http://localhost:8080>, click **Start conversation**, allow the
+microphone, and wait for the greeting before you speak.
+
+### Things to try
+
+| Ask | Goes to |
+|---|---|
+| "What savings accounts do you have?" | The knowledge base |
+| "I got a text saying my account is locked and I need to verify my details. Is it a scam?" | The Fraud & Scam Awareness Agent |
+| "I earn £70k, I've got £40k saved and no debts. How much could I borrow?" | The Mortgage Agent, with the "is that okay?" question and hold music |
+
+### Reading the server log
+
+Each turn logs what the caller said (`user:`), any filler line, the tools and
+agents wxO calls (`tool call:`), when the reply started and what the agent
+said (`agent said:`). After the first reply of each call it also logs either
+`wxO is streaming replies` or a warning that wxO sent the reply all at once
+(see Troubleshooting).
 
 ## Settings
 
-| Variable | Default | |
-|---|---|---|
-| `WXO_INSTANCE_URL` | | Settings → API details in wxO |
-| `WXO_AGENT_ID` | | |
-| `WXO_API_KEY` | | Exchanged for an IAM token, refreshed automatically |
-| `WXO_FILLER_AGENT_ID` | | The tool-free agent that writes everything said while the main agent works. Without it, nothing is said until the answer |
-| `ELEVENLABS_API_KEY` | | |
-| `ELEVENLABS_SPEECH_ENGINE_ID` | | From `create_engine.py` |
-| `ELEVENLABS_VOICE_ID` | | Optional, read by `create_engine.py` |
-| `ELEVENLABS_TTS_MODEL` | `eleven_v4_turbo` | Voice model, applied by `create_engine.py` |
-| `ENGINE_LANGUAGE` | `en` | Read by `create_engine.py` |
-| `LINE_GAP_SECONDS` | `0.6` | Pause after one filler line finishes before the next "still on it" line, while the answer hasn't started |
-| `QUICK_FILLER` | `true` | Ask the filler agent each turn; `false` stays quiet until the answer |
-| `SPECIALIST_ASK` | "That one might take a little longer to check, is that okay?" | Asked before waiting for the mortgage specialist. Empty turns the ask and hold music off |
-| `SPECIALIST_DECLINED` | "No problem. Is there anything else I can help with?" | Said if the caller would rather not wait |
-| `SPECIALIST_TOOLS` | `mortgage\|affordab` | Pattern matched against the name of the tool or agent wxO routes to. The server logs every name as `tool call: …` |
-| `TURN_EAGERNESS` | `normal` | `patient`, `normal` or `eager`: how soon the caller's turn is judged finished. Read by `create_engine.py` |
-| `TOKENS_PER_MINUTE` | `12` | Per IP address, protects your ElevenLabs quota |
-| `DEBUG` | `false` | Verbose logs, including the Speech Engine SDK's own |
-| `DISABLE_AUTH` | `false` | Skips the ElevenLabs signature check on `/ws`. Never in Code Engine |
+All in `.env`; `.env.example` explains each one.
 
-## Security
+| Variable | |
+|---|---|
+| `WXO_INSTANCE_URL`, `WXO_AGENT_ID`, `WXO_API_KEY` | Required. From Settings → API details in wxO |
+| `ELEVENLABS_API_KEY` | Required |
+| `ELEVENLABS_SPEECH_ENGINE_ID` | Printed by `create_engine.py` the first time |
+| `ELEVENLABS_VOICE_ID` | Optional. Applied by `create_engine.py` |
+| `FILLERS` | Optional. The lines played while wxO searches, separated by `\|` |
+| `SPECIALIST_ASK` | Optional. The question asked before a borrowing estimate; empty turns it and the hold music off |
+| `TURN_EAGERNESS` | Optional. `patient`, `normal` or `eager`: how soon the caller's turn counts as finished. Applied by `create_engine.py` |
 
-- Both API keys stay on the server. The browser only gets a short-lived
-  conversation token.
-- `/ws` only accepts connections signed by ElevenLabs. They sign each one with
-  a JWT derived from your API key, and connections without a valid one are
-  rejected before the socket opens.
-- Speech is treated as untrusted input and capped at 8,192 characters before
-  it reaches the agent.
+Finer timing (how soon fillers play, the quieter follow-up lines, the hold
+music trigger) is set at the top of `server/app.py`.
 
 ## Troubleshooting
 
 | What you see | What to do |
 |---|---|
-| App won't start: `Missing settings` | A required variable is empty in the Code Engine secret |
-| Caption: "The voice service isn't set up yet." | `ELEVENLABS_SPEECH_ENGINE_ID` isn't set on the app (step 3) |
-| Caption: "Microphone access is blocked" | Allow the microphone for this site in the browser's site settings |
-| Connects, then silence | Check the logs. `rejected /ws connection` means the engine was created with a different ElevenLabs API key than the app has |
-| Agent says it's having trouble reaching the information | The wxO request failed. Look for `wxO request failed` in the logs: 401 means `WXO_API_KEY`, 404 means the instance URL or agent ID |
-| Conversations end after 10 minutes | Code Engine's request limit (see step 2) |
+| The orb starts, then the call ends straight away, and the server log has no `WebSocket /ws [accepted]` | The ngrok address has changed. Run `create_engine.py` with the new one |
+| The page says "Client not built" | Run `cd client && npm install && npm run build`, then restart the server |
+| `address already in use` when starting the server | An old server is still running: `lsof -ti tcp:8080 \| xargs kill` |
+| The greeting is "No action required", or answers sound like chat replies | The deployed agent doesn't have the voice instructions. Paste them in, save and **deploy** |
+| The greeting gets cut off | The microphone heard you or background noise. Stay quiet until she's said hello |
+| Silence after every question, with no `agent said:` in the log | wxO is returning nothing. A control whose endpoint is offline will do this, because controls fail closed. Try the agent in the wxO chat to see the error |
+| The log warns that wxO sent the reply all at once | The agent's model isn't streaming. Answers still play, but start later. We saw this with the Bedrock-hosted gpt-oss-120b; the Groq-hosted one streams |
+| The agent says it's having trouble reaching Northbridge | The wxO request failed. Look for `wxO request failed` in the log: 401 means the API key, 404 the instance URL or agent ID |
+| "Microphone access is blocked" | Allow the microphone for localhost in the browser's site settings |
+
+## Security
+
+- Both API keys stay on the server. The browser only gets a short-lived
+  conversation token.
+- `/ws` only accepts connections signed by ElevenLabs, so other people can't
+  connect to it through your ngrok address.
+- ngrok makes the page public while it runs, so each visitor can start at most
+  12 conversations a minute, to protect your ElevenLabs credit.
+- Speech is capped at 8,192 characters before it reaches the agent.
+
+## Project layout
+
+```
+├── wxo-agent-instructions.md   the Northbridge Bank Agent's voice instructions
+├── .env.example
+├── client/                     the page (Vite, no framework)
+│   ├── index.html              the Northbridge site and the orb
+│   ├── public/hold-music.mp3
+│   └── src/
+│       ├── orb.js              the dot-cloud orb and its states
+│       ├── voice.js            the ElevenLabs session and the orb's state
+│       ├── main.js             wires the two together
+│       └── styles.css
+└── server/
+    ├── app.py                  FastAPI: /api/token, /ws, the page; settings
+    ├── turns.py                one call: wxO thread, fillers, re-sends, the mortgage hand-off
+    ├── questions.py            spots small talk and questions that need a search
+    ├── wxo.py                  IAM token and streaming chat/completions
+    ├── sse.py                  parses wxO's stream (text, tool calls, thread id)
+    ├── speech.py               strips markdown and links from the reply
+    ├── create_engine.py        creates or re-points the ElevenLabs Speech Engine
+    └── tests/                  replay a recorded wxO stream; no keys needed
+```
+
+## Developing
+
+Tests run without network access or keys:
+
+```bash
+cd server && python -m unittest discover tests
+```
+
+For work on the page, `npm run dev` in `client/` serves it on port 5173 and
+passes `/api` through to the server on 8080. In that mode,
+`__orbManual('thinking')` in the browser console drives the orb without a
+call, and `__orbManual(false)` hands control back.

@@ -3,16 +3,14 @@
 from __future__ import annotations
 
 import asyncio
-import collections
 import difflib
 import logging
-import random
 import re
 import time
 from dataclasses import dataclass, field
 from typing import AsyncIterator, Callable, Optional, Sequence
 
-import filler_agent
+import questions
 from speech import SpokenText
 from wxo import WxoClient, WxoError
 
@@ -32,17 +30,13 @@ SAME_TURN_SIMILARITY = 0.85
 REPEAT_WINDOW = 12.0
 # ElevenLabs can also re-send a *longer* version of a turn a moment after
 # it's been answered. Within this window that's still a repeat; after it, a
-# longer version is a new question ("parking" then "parking for blue badges").
+# longer version is a new question ("ISA rates" then "ISA rates for under-18s").
 LATE_RESEND_WINDOW = 4.0
 # When ElevenLabs re-sends a turn, it drops whatever was just sent for the
 # earlier copy. A filler line sent this recently can't have finished playing,
 # so it is said again for the new copy.
 RESAY_WINDOW = 2.5
-# How long the filler agent may take before its lines are no longer useful.
-FILLER_TIMEOUT = 6.0
-
-# Said the instant the caller's turn ends when there's no filler agent: an
-# "I heard you", not a "let me think". Overridden by ACKNOWLEDGEMENTS in .env.
+# Fillers used when none are passed in (app.py passes FILLERS from .env).
 ACKNOWLEDGEMENTS = ("Mm-hmm.", "Mhm.")
 
 _END = object()
@@ -149,7 +143,6 @@ class _Job:
     started: float
     queue: asyncio.Queue
     producer: Optional[asyncio.Task] = None
-    filler_task: Optional[asyncio.Task] = None
     spoken: SpokenText = field(default_factory=SpokenText)
     sent: list = field(default_factory=list)   # real answer text sent so far
     filled: bool = False        # an acknowledgement has been spoken
@@ -171,9 +164,8 @@ class _Job:
     streamed: bool = False      # the answer arrived word by word, not all at once
 
     def cancel(self) -> None:
-        for task in (self.producer, self.filler_task):
-            if task and not task.done():
-                task.cancel()
+        if self.producer and not self.producer.done():
+            self.producer.cancel()
 
 
 class Conversation:
@@ -182,18 +174,14 @@ class Conversation:
     The thread lives in this object, which lives exactly as long as the
     WebSocket, so nothing accumulates on the server between conversations.
 
-    While wxO works, everything said before the answer comes from the filler
-    agent (WXO_FILLER_AGENT_ID); nothing is hard-coded:
-      - instantly, a short reaction it wrote in advance ("Sure."), which fits
-        any question because it promises nothing
-      - its acknowledgement, the moment it's written, opening with a brief
-        apology if the caller had cut the agent off
-      - up to two "still on it" lines, each following the previous line with
-        a short pause (`hold_after` seconds), while the answer hasn't started
-    Without a filler agent, a quiet "Mm-hmm." plays if the answer hasn't
-    started `acknowledge_after` seconds after the caller's turn ends. If it
-    still hasn't started `still_thinking_after` seconds after that, one
-    whispered "mm-hmm" follows.
+    While wxO works, a short filler line ("Hm...") plays when wxO starts
+    searching, or if the answer hasn't started `acknowledge_after` seconds
+    after the caller's turn ends (sooner for questions that look like they'll
+    need a search). If it still hasn't started `still_thinking_after` seconds
+    after that, one quieter line follows. Small talk gets no filler.
+
+    Personal borrowing estimates go to the slower Mortgage Agent: the caller is
+    asked whether they mind waiting, and hold music plays on their go-ahead.
     """
 
     def __init__(
@@ -202,7 +190,6 @@ class Conversation:
         *,
         hold_after: float,
         quick_filler: bool = True,
-        filler_agent_id: Optional[str] = None,
         acknowledgements: Sequence[str] = (),
         still_thinking: Sequence[str] = (),
         still_thinking_after: float = 2.5,
@@ -217,7 +204,6 @@ class Conversation:
         self.thread_id: Optional[str] = None
         self.hold_after = hold_after
         self.quick_filler = quick_filler
-        self.filler_agent_id = filler_agent_id or None
         self.acknowledgements = [a for a in acknowledgements if a.strip()] or list(ACKNOWLEDGEMENTS)
         self._next_ack = 0  # position in the list, so each one is used in turn
         # A very quiet second acknowledgement if the answer is slow to start.
@@ -231,19 +217,14 @@ class Conversation:
         self.specialist_tools = specialist_tools
         self._waiting: Optional[_Job] = None  # asked to wait; needs the caller's go-ahead
         # Tells the page what's playing, so its caption and orb don't have to
-        # guess from sound levels: "filler", "hold", "answer".
+        # guess from sound levels: "filler", "ask", "music", "hold", "answer".
         self.on_phase = on_phase
         self._next_still = 0
         self.conversation_id: Optional[str] = None
         self._job: Optional[_Job] = None
-        self._last_agent_text = ""  # the assistant's last answer, for the filler agent
-        # Filler lines already spoken this conversation, so the filler agent
-        # (which starts fresh every time) can avoid repeating itself.
-        self._recent_fillers: collections.deque = collections.deque(maxlen=6)
-        # A short reaction written in advance ("Sure."), ready to play the
-        # instant the caller finishes, while the filler agent writes its line.
-        self._ready: Optional[str] = None
-        self._prefetch_task: Optional[asyncio.Task] = None
+        # The assistant's last answer: tells a mortgage follow-up ("I earn 70k")
+        # from figures given for something else.
+        self._last_agent_text = ""
         self._stream_noted = False  # logged whether wxO streams, once per conversation
 
     def _wants_specialist(self, user_text: str) -> bool:
@@ -255,8 +236,6 @@ class Conversation:
         return (self.conversation_id or "-")[:14]
 
     def close(self) -> None:
-        if self._prefetch_task and not self._prefetch_task.done():
-            self._prefetch_task.cancel()
         if self._job:
             self._job.cancel()
             self._job = None
@@ -355,8 +334,6 @@ class Conversation:
                 job.wants_specialist = True
                 yield self._ask_to_wait(job)
                 return
-            if not job.filled and self.quick_filler and self.filler_agent_id:
-                job.filler_task = asyncio.create_task(self._filler_lines(job, False))
             async for chunk in self._run(job):
                 yield chunk
             return
@@ -379,29 +356,13 @@ class Conversation:
             job.wants_specialist = True
             yield self._ask_to_wait(job)
             return
-        if self.quick_filler and self.filler_agent_id and not filler_agent.is_small_talk(user_text):
-            # The filler agent hears the question and writes lines that fit
-            # it; they arrive about a second later.
-            job.filler_task = asyncio.create_task(self._filler_lines(job, interrupted))
-            if self._ready and not interrupted:
-                # Meanwhile, a short reaction written in advance ("Sure.")
-                # plays the instant the caller stops. Interruptions skip it:
-                # the filler agent's own line opens with an apology instead.
-                reaction = self._ready
-                self._ready = None
-                _mark_spoken(job, reaction, now)
-                self._recent_fillers.append(reaction)
-                log.info("[%s] reaction (ready): %s", self.cid, reaction)
-                self._phase("filler")
-                yield _line(reaction)
-        elif self.quick_filler and not filler_agent.is_small_talk(user_text):
-            # No filler agent: a filler line when wxO starts searching (or, as a
-            # backstop, if nothing has come back after `acknowledge_after`
-            # seconds). Questions answered without a search get nothing.
+        if self.quick_filler and not questions.is_small_talk(user_text):
+            # A filler line when wxO starts searching (or, as a backstop, if
+            # nothing has come back after `acknowledge_after` seconds).
             # Questions that look like they'll need a search get it sooner,
             # without waiting for wxO to decide.
             wait = self.acknowledge_after
-            if self.early_filler_after > 0 and filler_agent.likely_needs_lookup(user_text):
+            if self.early_filler_after > 0 and questions.likely_needs_lookup(user_text):
                 wait = min(wait, self.early_filler_after)
             job.ack_due = now + wait
 
@@ -431,7 +392,6 @@ class Conversation:
                         line = job.hold_lines.pop(0)
                         log.info("[%s] still looking: %s", self.cid, line)
                         _mark_spoken(job, line, time.monotonic())
-                        self._recent_fillers.append(line)
                         self._phase("hold")
                         yield _line(line)
                     continue
@@ -440,15 +400,7 @@ class Conversation:
                     break
                 kind, value = item
 
-                if kind == "filler":
-                    if not job.answered and not job.filled:
-                        job.filled = True
-                        job.filled_at = time.monotonic()
-                        _mark_spoken(job, value, job.filled_at)
-                        self._recent_fillers.append(value)
-                        self._phase("filler")
-                        yield _line(value)
-                elif kind == "thread":
+                if kind == "thread":
                     if value != self.thread_id:
                         self.thread_id = value
                         log.info("[%s] wxO thread %s", self.cid, value)
@@ -479,8 +431,6 @@ class Conversation:
                         if not job.answered:
                             log.info("[%s] first reply text (+%.0f ms)", self.cid, _ms(job.started))
                             self._phase("answer")
-                            if job.filler_task and not job.filler_task.done():
-                                job.filler_task.cancel()
                         job.answered = True
                         job.sent.append(text)
                         yield text
@@ -510,9 +460,6 @@ class Conversation:
             if job.sent:
                 said = " ".join("".join(job.sent).split())
                 log.info("[%s] agent said: %s", self.cid, said if len(said) <= 200 else said[:200] + "…")
-            # Write the next filler line now, knowing what was just said, so
-            # it's ready the instant the caller finishes their next question.
-            self._prefetch(fresh=True)
         except (asyncio.CancelledError, GeneratorExit):
             # The SDK cancels us when a new turn arrives. Leave the wxO request
             # running: if that turn is this same question re-sent, we carry on.
@@ -567,90 +514,6 @@ class Conversation:
         self._next_ack += 1
         return ack
 
-    def _prefetch(self, fresh: bool = False) -> None:
-        """Have the filler agent write the next line now, in the background,
-        so it's ready the instant the caller finishes their next question.
-        fresh=True replaces any line written before the latest answer."""
-        if not (self.quick_filler and self.filler_agent_id):
-            return
-        if fresh:
-            self._ready = None
-            if self._prefetch_task and not self._prefetch_task.done():
-                self._prefetch_task.cancel()
-        elif self._ready or (self._prefetch_task and not self._prefetch_task.done()):
-            return
-        self._prefetch_task = asyncio.create_task(self._write_ahead())
-
-    async def _write_ahead(self) -> None:
-        started = time.monotonic()
-        prompt = filler_agent.build_prompt(
-            None,
-            interrupted=False,
-            already_said=self._recent_fillers,
-            assistant_said=self._last_agent_text,
-        )
-        try:
-            raw = await asyncio.wait_for(self._ask_filler_agent(prompt), FILLER_TIMEOUT)
-        except asyncio.CancelledError:
-            raise
-        except Exception as e:
-            log.info("[%s] filler agent couldn't write ahead: %s", self.cid, e or type(e).__name__)
-            return
-        reaction = filler_agent.parse_reaction(raw)
-        if reaction:
-            self._ready = reaction
-            log.info("[%s] reaction ready for next question: %s (%.0f ms)", self.cid, reaction, _ms(started))
-        else:
-            log.info("[%s] written-ahead reaction not usable: %r", self.cid, raw[:60])
-
-    async def _ask_filler_agent(self, prompt: str) -> str:
-        parts: list[str] = []
-        final: list[str] = []
-        async for event in self.wxo.stream(prompt, None, agent_id=self.filler_agent_id):
-            if event.kind == "text":
-                parts.append(event.value)
-            elif event.kind == "final_text":
-                final.append(event.value)  # models that don't stream
-            elif event.kind == "done":
-                break
-        return ("".join(parts) or "".join(final)).strip()
-
-    async def _filler_lines(self, job: _Job, interrupted: bool) -> None:
-        """Ask the filler agent, live, for an acknowledgement and a 'still looking' line."""
-        prompt = filler_agent.build_prompt(
-            job.text,
-            interrupted=interrupted,
-            already_said=self._recent_fillers,
-            assistant_said=self._last_agent_text,
-        )
-        raw = ""
-
-        async def collect() -> None:
-            nonlocal raw
-            raw = await self._ask_filler_agent(prompt)
-
-        try:
-            await asyncio.wait_for(collect(), FILLER_TIMEOUT)
-        except asyncio.CancelledError:
-            log.info("[%s] filler agent not needed after %.0f ms", self.cid, _ms(job.started))
-            raise
-        except asyncio.TimeoutError:
-            log.info("[%s] filler agent too slow, skipped", self.cid)
-            return
-        except Exception as e:
-            log.warning("[%s] filler agent failed: %s", self.cid, e)
-            return
-
-        ack, holds = filler_agent.parse_reply(raw)
-        if job.specialist:
-            return  # the caller has been asked to wait for the specialist
-        job.hold_lines = holds
-        if ack is None:
-            log.info("[%s] filler agent: %r (not spoken) (+%.0f ms)", self.cid, raw[:80], _ms(job.started))
-            return
-        log.info("[%s] filler agent: %s | %s (+%.0f ms)", self.cid, ack, " | ".join(holds) or "-", _ms(job.started))
-        await job.queue.put(("filler", ack))
-
     async def _produce(self, job: _Job) -> None:
         attempts = 2 if self.thread_id else 1
         try:
@@ -704,7 +567,7 @@ MIN_NEW_WORDS = 1
 
 
 def _stem(word: str) -> str:
-    """Rough stem so "test"/"tests" and "park"/"parking" match."""
+    """Rough stem so "account"/"accounts" and "save"/"saving" match."""
     for suffix in ("ing", "es", "s"):
         if len(word) > len(suffix) + 2 and word.endswith(suffix):
             return word[: -len(suffix)]
@@ -713,8 +576,8 @@ def _stem(word: str) -> str:
 
 def _adds_words(text: str, previous_normalised: str) -> bool:
     """The new transcript adds something real to the one being worked on:
-    "parking" → "parking, where can I park and how much is it". Repeats and
-    small wording changes ("test" / "tests") don't count."""
+    "ISAs" → "ISAs, what's the rate and how much can I put in". Repeats and
+    small wording changes ("account" / "accounts") don't count."""
     if not previous_normalised:
         return False
     before = {_stem(w) for w in previous_normalised.split()}
@@ -740,8 +603,8 @@ def _same_turn(text: str, previous_normalised: str, allow_longer: bool = True) -
 
 def _same_subject(now: str, previous_normalised: str) -> bool:
     """Every subject word in the new transcript was already in the question,
-    and there's at least one: "who would I contact a specific ward" vs
-    "how would I contact a specific ward or department". Small talk ("yes")
+    and there's at least one: "who do I contact about my mortgage application"
+    vs "how do I contact someone about my mortgage application". Small talk ("yes")
     has no subject words, so it never matches."""
     words = [w for w in now.split() if w not in _FILLER_WORDS]
     before = {_stem(w) for w in previous_normalised.split()}
